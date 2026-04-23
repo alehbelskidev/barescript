@@ -1,0 +1,159 @@
+// imports
+import (
+    fs from node:fs
+)
+
+// interfaces
+interface Greetable {
+    sayHi()
+    sayBye()
+}
+
+// enums
+enum RequestState {
+    Idle
+    Loading
+    Success(data User)
+    Failure(message string)
+}
+
+// objects
+@serializable
+object Address {
+    street string
+    city string
+
+    fn init(street string, city string) {
+        this{street: street, city: city}
+    }
+}
+
+@serializable
+object User {
+    id number
+    name string
+    address Address
+
+    fn describe() {
+        console.log('User object')
+    }
+
+    fn init(id number, name string, address Address) {
+        this{id: id, name: name, address: address}
+    }
+}
+
+object Programmer: User {
+    language string
+
+    fn init(id number, name string, address Address, language string) {
+        super(id, name, address)
+        this{language: language}
+    }
+}
+
+// prototype
+prototype User: Greetable {
+    fn sayHi() {
+        console.log('Hi, i am #{this.name}')
+    }
+
+    fn sayBye() {
+        console.log('Bye from #{this.name}')
+    }
+}
+
+// generics
+fn<T> identity(val T) T {
+    val
+}
+
+// async
+async fn fetchUser(id number) Promise<User> {
+    Promise.resolve(User(1, 'Alex', Address('Street 1', 'Warsaw')))
+}
+
+// nullable + if-let
+fn findUser(id number) User? {
+    User(id, 'Alex', Address('Main St', 'Warsaw'))
+}
+
+// option
+fn tryFind(id number) Option<User> {
+    Some(User(id, 'Alex', Address('Main St', 'Warsaw')))
+}
+
+// result
+fn parseUser(raw string) Result<User, Error> {
+    Ok(User(1, 'Alex', Address('Main St', 'Warsaw')))
+}
+
+// try operator
+fn safeParseUser(raw string) {
+    match try JSON.parse(raw) {
+        Ok(data) -> console.log(data)
+        Err(e)   -> console.log(e)
+    }
+}
+
+// match on enum
+fn handleState(state RequestState) {
+    match state {
+        RequestState.Idle           -> console.log('idle')
+        RequestState.Loading        -> console.log('loading')
+        RequestState.Success(data)  -> console.log(data)
+        RequestState.Failure(message) -> console.log(message)
+    }
+}
+
+// variables
+greeting = 'Hello'
+mut counter number
+counter = 0
+
+// if-let
+if user = findUser(1) {
+    console.log(user.name)
+}
+
+// for
+nums = [1, 2, 3, 4, 5]
+for n in nums {
+    console.log(n)
+}
+
+// trailing closures
+result = nums.map { n in
+    n * 2
+}
+
+nums.reduce(0) { acc, n in
+    acc + n
+}
+
+setTimeout(1000) {
+    console.log('done')
+}
+
+// generator
+fn* range(start number, end number) {
+    mut i = start
+    for i in nums {
+        yield i
+    }
+}
+
+// destructuring
+addr = Address('Main St', 'Warsaw')
+unpack {street, city} = addr
+
+// serialization
+match try User.fromJSON('{"id":1,"name":"Alex"}') {
+    Ok(user)  -> console.log(user.name)
+    Err(e)    -> console.log(e)
+}
+
+// export
+export fn printMe() {
+    console.log('printme')
+}
